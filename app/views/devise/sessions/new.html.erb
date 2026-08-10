@@ -1,0 +1,17 @@
+<h2>Log in</h2>
+
+<%= form_for(resource, as: resource_name, url: user_session_path(tenant_name: params[:tenant_name])) do |f| %>
+  <div>
+    <%= f.label :email %><br />
+    <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
+  </div>
+
+  <div>
+    <%= f.label :password %><br />
+    <%= f.password_field :password, autocomplete: "current-password" %>
+  </div>
+
+  <div><%= f.submit "Log in" %></div>
+<% end %>
+
+<%= render "devise/shared/links" %>

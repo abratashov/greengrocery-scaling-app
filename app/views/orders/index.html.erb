@@ -1,0 +1,19 @@
+<h1>Orders</h1>
+
+<%= link_to "New Order", new_order_path %>
+
+<% @orders.each do |order| %>
+  <div>
+    <h3>Order #<%= order.id %> - <%= order.state %></h3>
+    <p>Items:</p>
+    <ul>
+      <% order.product_orders.each do |item| %>
+        <li><%= item.product.name %> x <%= item.amount %> - <%= number_to_currency(item.total_price) %></li>
+      <% end %>
+    </ul>
+    <% if order.payment.present? %>
+      <p>Payment: <%= order.payment.state %> - <%= number_to_currency(order.payment.total_price) %></p>
+    <% end %>
+    <%= link_to "View", order_path(order) %>
+  </div>
+<% end %>

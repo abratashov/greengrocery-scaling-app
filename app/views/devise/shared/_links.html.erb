@@ -1,0 +1,7 @@
+<% if controller_name != 'registrations' %>
+  <p><%= link_to "Sign up", new_user_registration_path(tenant_name: params[:tenant_name]) %></p>
+<% end %>
+
+<% if controller_name != 'sessions' %>
+  <p><%= link_to "Log in", new_user_session_path(tenant_name: params[:tenant_name]) %></p>
+<% end %>

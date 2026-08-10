@@ -1,0 +1,19 @@
+<h1><%= @tenant.name %></h1>
+
+<% if @signed_in_user.present? %>
+  <% current_user = @signed_in_user %>
+  <p><%= current_user&.email || "Signed in" %> | <%= button_to "Sign out", destroy_user_session_path(tenant_name: @tenant.name), method: :delete, form: { style: "display:inline" } %></p>
+  <p><%= link_to "Manage Products", products_path %> | <%= link_to "View Orders", orders_path %> | <%= link_to "New Order", new_order_path %></p>
+<% else %>
+  <p><%= link_to "Sign in", new_user_session_path(tenant_name: @tenant.name) %> | <%= link_to "Register", new_user_registration_path(tenant_name: @tenant.name) %></p>
+<% end %>
+
+<% if @products.any? %>
+  <ul>
+    <% @products.each do |product| %>
+      <li><%= product.name %> - <%= number_to_currency(product.price) %> (available: <%= product.amount %>)</li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>No products available.</p>
+<% end %>
