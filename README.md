@@ -177,6 +177,9 @@ mise use postgres@18.4
 # In case of errors run:
 # sudo apt install -y flex bison build-essential libreadline-dev zlib1g-dev libssl-dev libicu-dev libxml2-dev libxslt1-dev liblz4-dev libzstd-dev
 
+# Generate/add Rails master key to env:
+cp .default.env .env
+
 # To run in development or docker-compose mode comment / uncomment sections at:
 # - app/models/application_record.rb
 # - config/database.yml
