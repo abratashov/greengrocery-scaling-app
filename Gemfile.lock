@@ -407,6 +407,7 @@ DEPENDENCIES
   capybara
   debug
   devise (~> 5.0)
+  dotenv (~> 3.2)
   image_processing (~> 1.2)
   importmap-rails
   interactor (~> 3.2)

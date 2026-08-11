@@ -1,0 +1,88 @@
+services:
+  haproxy:
+    image: haproxy:3.2-alpine
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./docker/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    depends_on:
+      rails-1:
+        condition: service_healthy
+      rails-2:
+        condition: service_healthy
+
+  rails-1:
+    build: .
+    environment: &rails-env
+      RAILS_ENV: development
+      DATABASE_HOST: postgres
+      DATABASE_NAME: greengrocery_development
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: postgres
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/greengrocery_development
+      SOLID_QUEUE_DATABASE_HOST: postgres
+      SOLID_QUEUE_DATABASE_NAME: greengrocery_queue
+      SOLID_QUEUE_DATABASE_USER: postgres
+      SOLID_QUEUE_DATABASE_PASSWORD: postgres
+      RAILS_MAX_THREADS: 5
+    command: bin/rails server -b 0.0.0.0 -p 3000
+    expose:
+      - "3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/up"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  rails-2:
+    build: .
+    environment:
+      <<: *rails-env
+    command: bin/rails server -b 0.0.0.0 -p 3000
+    expose:
+      - "3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/up"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  worker-1:
+    build: .
+    environment: *rails-env
+    command: bin/jobs
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  worker-2:
+    build: .
+    environment: *rails-env
+    command: bin/jobs
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: greengrocery_development
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      # test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d greengrocery_development"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres-data:
