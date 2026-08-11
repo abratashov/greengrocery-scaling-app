@@ -29,4 +29,12 @@ class ApplicationController < ActionController::Base
   def signed_in_user?
     session[:user_id].present?
   end
+
+  def log_db_info
+    yield
+
+    Rails.logger.info(
+      "[DB-INFO] #{ApplicationRecord.connection_db_config.host}:#{ApplicationRecord.connection_db_config.database}"
+    )
+  end
 end

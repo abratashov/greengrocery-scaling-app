@@ -16,10 +16,10 @@ services:
     environment: &rails-env
       RAILS_ENV: development
       DATABASE_HOST: postgres
-      DATABASE_NAME: greengrocery_development
+      DATABASE_NAME: greengrocery_scaling_app_development
       DATABASE_USER: postgres
       DATABASE_PASSWORD: postgres
-      DATABASE_URL: postgres://postgres:postgres@postgres:5432/greengrocery_development
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/greengrocery_scaling_app_development
       SOLID_QUEUE_DATABASE_HOST: postgres
       SOLID_QUEUE_DATABASE_NAME: greengrocery_queue
       SOLID_QUEUE_DATABASE_USER: postgres
@@ -53,36 +53,64 @@ services:
       timeout: 3s
       retries: 10
 
-  worker-1:
-    build: .
-    environment: *rails-env
-    command: bin/jobs
-    depends_on:
-      postgres:
-        condition: service_healthy
+  # worker-1:
+  #   build: .
+  #   environment: *rails-env
+  #   command: bin/jobs
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
 
-  worker-2:
-    build: .
-    environment: *rails-env
-    command: bin/jobs
-    depends_on:
-      postgres:
-        condition: service_healthy
+  # worker-2:
+  #   build: .
+  #   environment: *rails-env
+  #   command: bin/jobs
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
 
   postgres:
     image: postgres:17
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: greengrocery_development
+      POSTGRES_DB: greengrocery_scaling_app_development
+
+    # replication settiongs:
+    command:
+      - postgres
+      - -c
+      - wal_level=replica
+      - -c
+      - max_wal_senders=10
+      - -c
+      - max_replication_slots=10
+      - -c
+      - hot_standby=on
+      - -c
+      - hba_file=/etc/postgresql/pg_hba.conf
     volumes:
       - postgres-data:/var/lib/postgresql/data
+      - ./infrastructure/postgres/pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
+
     healthcheck:
       # test: ["CMD-SHELL", "pg_isready -U postgres"]
-      test: ["CMD-SHELL", "pg_isready -U postgres -d greengrocery_development"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d greengrocery_scaling_app_development"]
       interval: 5s
       timeout: 5s
       retries: 10
 
+  postgres-replica:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: greengrocery_scaling_app_development
+    depends_on:
+      - postgres
+    volumes:
+      - postgres-replica-data:/var/lib/postgresql/data
+
 volumes:
   postgres-data:
+  postgres-replica-data:

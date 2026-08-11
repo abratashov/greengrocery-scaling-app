@@ -2,6 +2,8 @@ class OrdersController < ApplicationController
   before_action :require_signed_in_user!
   before_action :set_order, only: %i[show]
 
+  around_action :log_db_info
+
   def index
     @orders = Order.includes(:product_orders, :payment).order(created_at: :desc)
   end
