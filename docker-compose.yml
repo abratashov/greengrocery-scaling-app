@@ -4,7 +4,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./docker/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+      - ./infrastructure/haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
     depends_on:
       rails-1:
         condition: service_healthy
