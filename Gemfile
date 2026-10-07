@@ -65,7 +65,7 @@ group :test do
   gem "selenium-webdriver"
 end
 
-gem "acts_as_tenant", "~> 1.0"
+gem "acts_as_tenant", "~> 2.0"
 gem "devise", "~> 5.0"
 gem "dotenv", "~> 3.2"
 gem "interactor", "~> 3.2"
